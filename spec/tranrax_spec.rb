@@ -95,7 +95,7 @@ describe Tranrax do
 
     context 'mapped' do
       subject do
-        described_class.new do
+        described_class.new do |t|
           [99, add_rollback, add_postcommit]
         end.map { |x| x + 1 }
       end
@@ -130,7 +130,7 @@ describe Tranrax do
             [x + 1, add_rollback, add_postcommit]
           end.map { |x| x * 3 }
         end.map { |x| x / 2 }
-        .bind { |x| described_class.new { [x + 150, add_rollback, add_postcommit] } }
+                       .bind { |x| described_class.new { [x + 150, add_rollback, add_postcommit] } }
       end
 
       let(:result) { 300 }

@@ -30,7 +30,7 @@ write_file = lambda do |file_name, contents|
   end
 end
 
-write_file.call('example.txt', 'hello world exists').transact do |result|
+write_file.call('example.txt', 'hello world exists').transact do |_result|
   # at this point file is written and you can observe changes
   # result == "whatever"
 
