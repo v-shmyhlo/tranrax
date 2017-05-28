@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'securerandom'
+require 'tranrax'
+require 'fileutils'
 
 # write_file returns Transaction which writes to a file
 # and restores original content (or removes file) in case of failure
@@ -30,7 +32,11 @@ write_file = lambda do |file_name, contents|
   end
 end
 
-write_file.call('example.txt', 'hello world exists').transact do |_result|
+# nothing is done at this point
+transaction = write_file.call('test_1.txt', 'hello world')
+
+# run transaction
+transaction.transact do |_result|
   # at this point file is written and you can observe changes
   # result == "whatever"
 
@@ -38,3 +44,15 @@ write_file.call('example.txt', 'hello world exists').transact do |_result|
   raise 'Damn :('
 end
 # rollback takes places, original file restored
+
+# you can compose transactions
+transaction = write_file
+  .call('test_1.txt', 'hello world')
+  .map { |result| "Result of first operation is \"#{result}\"" }
+  .bind { |result| write_file.call('test_2.txt', result) }
+
+# everything is rolled back
+transaction.transact do
+  sleep 3
+  raise 'Damn :('
+end
