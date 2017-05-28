@@ -25,6 +25,10 @@ Or install it yourself as:
 
 ## Usage
 
+More examples in "examples" foldes
+
+### Write to a file
+
 ```ruby
 # write_file returns Transaction which writes to a file
 # and restores original content (or removes file) in case of failure
@@ -80,6 +84,59 @@ transaction.transact do
   sleep 3
   raise 'Damn :('
 end
+```
+
+### Repo example
+
+```ruby
+User = Struct.new(:id, :name)
+
+class UserRepo
+  def initialize
+    @records = []
+  end
+
+  def all
+    @records
+  end
+
+  def create(record)
+    @records << record
+    record
+  end
+
+  def delete(id)
+    @records = @records.reject { |record| record.id == id }
+    nil
+  end
+end
+```
+
+```ruby
+create_user = lambda do |repo, user|
+  Tranrax::Transaction.new do
+    result = repo.create(user)
+
+    [result, -> { repo.delete(result.id) }]
+  end
+end
+
+repo = UserRepo.new
+repo.create(User.new(1, 'John'))
+
+transaction = create_user.call(repo, User.new(2, 'Joe'))
+
+transaction.transact do |result|
+  puts result
+  # => #<struct User id=2, name="Joe">
+  puts repo.all.count
+  # => 2
+
+  raise 'Damn :('
+end
+
+puts repo.all.count
+# => 1
 ```
 
 ## Development
