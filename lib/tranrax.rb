@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tranrax/version'
 
 module Tranrax
@@ -13,11 +15,11 @@ module Tranrax
       begin
         transaction_result = yield result
       rescue => e
-        rollback.call unless rollback.nil?
+        rollback&.call
         raise e
       end
 
-      postcommit.call unless postcommit.nil?
+      postcommit&.call
 
       transaction_result
     end

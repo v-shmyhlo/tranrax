@@ -47,7 +47,7 @@ write_file = lambda do |file_name, contents|
 
     File.write(file_name, contents)
 
-    # returns result of operation (nothing in this case), rollback operation and postcommit operation
+    # returns result of operation ("whatever" in this case), rollback operation and postcommit operation
     ['whatever', *operations]
   end
 end
